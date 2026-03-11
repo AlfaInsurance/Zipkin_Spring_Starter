@@ -1,11 +1,11 @@
-package testutils;
+package utils;
 
 import io.micrometer.observation.tck.TestObservationRegistry;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import ru.alfastrah.api.tracing.observation.ObservedAspectConfiguration;
+import ru.alfastrah.api.tracing.observability.ObservedAspectConfiguration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

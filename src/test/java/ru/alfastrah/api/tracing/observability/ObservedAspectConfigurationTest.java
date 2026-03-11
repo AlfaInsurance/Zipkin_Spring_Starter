@@ -1,4 +1,4 @@
-package ru.alfastrah.api.tracing.observation;
+package ru.alfastrah.api.tracing.observability;
 
 import io.micrometer.observation.annotation.Observed;
 import io.micrometer.observation.tck.TestObservationRegistry;
@@ -10,10 +10,10 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.context.ApplicationContext;
-import testutils.EnableTestObservation;
+import utils.EnableTestObservation;
 
 /**
- * @author nosovni on 29.10.2023
+ * @author nosovni on 18.08.2023
  */
 @EnableTestObservation
 @SpringBootTest(classes = ObservedAspectConfigurationTest.SomeClass.class)
@@ -32,7 +32,7 @@ class ObservedAspectConfigurationTest {
 
         final TestObservationRegistry observationRegistry = context.getBean(TestObservationRegistry.class);
         TestObservationRegistryAssert.assertThat(observationRegistry)
-                .hasObservationWithNameEqualTo("observation-name")
+                .hasObservationWithNameEqualTo("something-that-method-does")
                 .that()
                 .hasBeenStarted()
                 .hasBeenStopped();
@@ -40,7 +40,7 @@ class ObservedAspectConfigurationTest {
 
     @TestComponent
     public static class SomeClass {
-        @Observed(name = "observation-name")
+        @Observed(name = "something-that-method-does")
         public void foo() {
             System.out.println("bar");
         }
