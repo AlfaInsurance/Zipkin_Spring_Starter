@@ -17,7 +17,9 @@ import org.springframework.boot.test.context.TestConfiguration;
                 "custom.tracing.bootstrap-servers=server1,server2",
                 "custom.tracing.password=pass",
                 "custom.tracing.username=user",
-                "custom.tracing.topic=topic"
+                "custom.tracing.topic=topic",
+                "custom.tracing.security-protocol=protocol",
+                "custom.tracing.sasl-mechanism=mechanism"
         }
 )
 @EnableConfigurationProperties(CustomTracingProperties.class)
@@ -30,20 +32,21 @@ class CustomTracingPropertiesTest {
     void should_FillProps() {
         Assertions.assertThat(properties)
                 .isNotNull()
-                .satisfies(props -> {
-                    Assertions.assertThat(props.username())
-                            .isNotBlank()
-                            .isEqualTo("user");
-                    Assertions.assertThat(props.password())
-                            .isNotBlank()
-                            .isEqualTo("pass");
-                    Assertions.assertThat(props.topic())
-                            .isNotBlank()
-                            .isEqualTo("topic");
-                    Assertions.assertThat(props.bootstrapServers())
-                            .isNotEmpty()
-                            .contains("server1", "server2");
-                });
+                .extracting(
+                        CustomTracingProperties::username,
+                        CustomTracingProperties::password,
+                        CustomTracingProperties::topic,
+                        CustomTracingProperties::bootstrapServers,
+                        CustomTracingProperties::securityProtocol,
+                        CustomTracingProperties::saslMechanism
+                ).containsExactly(
+                        "user",
+                        "pass",
+                        "topic",
+                        "server1,server2",
+                        "protocol",
+                        "mechanism"
+                );
     }
 
     @ConfigurationPropertiesScan(basePackageClasses = CustomTracingProperties.class)

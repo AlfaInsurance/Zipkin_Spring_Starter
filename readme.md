@@ -18,7 +18,7 @@ mvn clean install
 <dependency>
     <groupId>ru.alfastrah.api</groupId>
     <artifactId>spring-boot-tracing-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -31,6 +31,8 @@ custom:
     password: pass
     topic: some-topic-name
     bootstrap-servers: server-1:port,server-2:port
+    sasl-mechanism: some-mechanism,
+    security-protocol: some-protocol
 ```
 
 - Enable tracing in `application.yaml` and set the sampling probability.
@@ -42,6 +44,8 @@ custom:
 management:
   tracing:
     enabled: true
+    propagation:
+      type: w3c
     sampling:
       # choose a sampling probability between 0.0 and 1.0
       probability: 1.0 
@@ -68,5 +72,7 @@ public class SomeClass {
 | custom.tracing.password                 | `String`  | kafka producer password                                                       | pass                        |
 | custom.tracing.topic                    | `String`  | kafka topic for traces                                                        | some-topic-name             |
 | custom.tracing.bootstrap-servers        | `String`  | kafka bootstrap servers                                                       | server-1:port,server-2:port |
+| custom.tracing.sasl-mechanism           | `String`  | kafka sasl mechanism                                                          | SCRAM-SHA-256               |
+| custom.tracing.security-protocol        | `String`  | kafka security protocol                                                       | SASL_SSL                    |
 | management.tracing.enabled              | `Boolean` | enables autoconfiguration                                                     | true                        |
 | management.tracing.sampling.probability | `Float`   | the probability of creating and saving traces for queries in your application | 1.0                         |
