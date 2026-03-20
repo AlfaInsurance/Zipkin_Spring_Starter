@@ -40,7 +40,7 @@ public class Constants {
                         "00", // https://www.w3.org/TR/trace-context/#version
                         traceContext.traceId(), // https://www.w3.org/TR/trace-context/#trace-id
                         traceContext.parentId(), // https://www.w3.org/TR/trace-context/#parent-id
-                        "01" // https://www.w3.org/TR/trace-context/#sampled-flag
+                        Boolean.TRUE.equals(traceContext.sampled()) ? "01" : "00" //https://www.w3.org/TR/trace-context/#sampled-flag
                 ));
 
         private Helpers() {

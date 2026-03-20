@@ -78,8 +78,8 @@ class SoapTraceParentOutDatabindingInterceptorTest {
 
     @ParameterizedTest
     @MethodSource("provideMessages")
-    void handleMessage_shouldAddTraceParentHeader(Message message) {
-        final TraceContext mockedTraceContext = getTraceContext();
+    void handleMessage_shouldAddTraceParentHeader_sampled(Message message) {
+        final TraceContext mockedTraceContext = getTraceContext(true);
 
         when(currentTraceContext.context())
                 .thenReturn(mockedTraceContext);
@@ -110,6 +110,40 @@ class SoapTraceParentOutDatabindingInterceptorTest {
         verifyNoMoreInteractions(currentTraceContext);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideMessages")
+    void handleMessage_shouldAddTraceParentHeader_notSampled(Message message) {
+        final TraceContext mockedTraceContext = getTraceContext(false);
+
+        when(currentTraceContext.context())
+                .thenReturn(mockedTraceContext);
+
+        @SuppressWarnings("unchecked") final Map<String, List<String>> headers = (Map<String, List<String>>) message.get(Message.PROTOCOL_HEADERS);
+        final int initialHeaderMapSize = isNull(headers) ? 0 : headers.size();
+
+        interceptor.handleMessage(message);
+
+        final StringJoiner expectedTraceParentValue = new StringJoiner("-");
+        expectedTraceParentValue.add("00");
+        expectedTraceParentValue.add(TRACE_ID);
+        expectedTraceParentValue.add(PARENT_ID);
+        expectedTraceParentValue.add("00");
+
+        assertThat(message.get(Message.PROTOCOL_HEADERS))
+                .asInstanceOf(MAP)
+                .hasSize(initialHeaderMapSize + 1)
+                .hasEntrySatisfying(TRACE_PARENT, headerValue ->
+                        assertThat(headerValue)
+                                .asInstanceOf(LIST)
+                                .hasSize(1)
+                                .first()
+                                .isEqualTo(expectedTraceParentValue.toString())
+                );
+
+        verify(currentTraceContext).context();
+        verifyNoMoreInteractions(currentTraceContext);
+    }
+
     @Test
     void handleMessage_shouldNotAddTraceParentHeader_whenNoTraceContextAvailable() {
         when(currentTraceContext.context())
@@ -123,12 +157,12 @@ class SoapTraceParentOutDatabindingInterceptorTest {
         verifyNoMoreInteractions(currentTraceContext);
     }
 
-    private TraceContext getTraceContext() {
+    private TraceContext getTraceContext(boolean sampled) {
         return tracer.traceContextBuilder()
                 .parentId(PARENT_ID)
                 .traceId(TRACE_ID)
                 .spanId(SPAN_ID)
-                .sampled(true)
+                .sampled(sampled)
                 .build();
     }
 }
